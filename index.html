@@ -1,24 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
   <title>AR - Pikachu</title>
 
-
   <!-- A-Frame -->
-
-
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
-
   <!-- AR.js NFT -->
-
-
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
-
 
   <style>
     * {
@@ -32,7 +25,6 @@
       font-family: Arial, sans-serif;
     }
 
-    /* Écran de chargement */
     #ar-loader {
       position: fixed;
       inset: 0;
@@ -76,39 +68,27 @@
       }
     }
   </style>
-
-
 </head>
-
 
 <body>
 
-
-  <!-- Écran d'attente -->
-
-
+  <!-- Écran de chargement -->
   <div id="ar-loader">
     <div class="loader-circle"></div>
     <h2>Recherche du panneau...</h2>
     <p>Pointez votre caméra vers le panneau jaune.</p>
   </div>
 
-
   <!-- Scène AR -->
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true;"
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+  >
 
-
-<a-scene
-embedded
-vr-mode-ui="enabled: false"
-renderer="logarithmicDepthBuffer: true;"
-arjs="
-trackingMethod: best;
-sourceType: webcam;
-debugUIEnabled: false;
-"
-
-<!-- Reconnaissance du panneau NFT -->
-<a-nft
+    <!-- Marqueur NFT -->
+    <a-nft
       id="panneau-marker"
       type="nft"
       url="assets/a"
@@ -118,40 +98,54 @@ debugUIEnabled: false;
       smoothThreshold="5"
     >
 
-<!-- Pikachu -->
-<a-entity
+      <!-- Modèle 3D Pikachu -->
+      <a-entity
         id="pikachu"
-        gltf-model="url(assets/pikachu.glb)"
+        gltf-model="url(assets/pokemon-pikachu.glb)"
         position="50 150 0"
         rotation="-90 0 0"
         scale="2 2 2"
       ></a-entity>
 
-</a-nft>
+    </a-nft>
 
-<!-- Caméra -->
-<a-entity camera></a-entity>
+    <!-- Caméra -->
+    <a-entity camera></a-entity>
 
   </a-scene>
-
 
   <script>
     const loader = document.getElementById("ar-loader");
     const marker = document.getElementById("panneau-marker");
+    const pikachu = document.getElementById("pikachu");
 
-    // Le panneau est reconnu
+    // Marqueur reconnu
     marker.addEventListener("markerFound", () => {
       console.log("Panneau reconnu !");
       loader.classList.add("hidden");
     });
 
-    // Le panneau n'est plus visible
+    // Marqueur perdu
     marker.addEventListener("markerLost", () => {
       console.log("Panneau perdu !");
       loader.classList.remove("hidden");
     });
-  </script>
 
+    // Chargement du modèle 3D
+    pikachu.addEventListener("model-loaded", () => {
+      console.log("Pikachu chargé !");
+    });
+
+    // Erreur de chargement du modèle
+    pikachu.addEventListener("model-error", (event) => {
+      console.error("Erreur Pikachu :", event.detail);
+    });
+
+    // Chargement de la scène
+    document.querySelector("a-scene").addEventListener("loaded", () => {
+      console.log("Scène AR chargée !");
+    });
+  </script>
 
 </body>
 </html>
