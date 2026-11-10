@@ -1,95 +1,301 @@
+
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>ALDILÀ — Expérience AR</title>
+
+  <!-- A-FRAME -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+
+  <!-- AR.JS NFT -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar-nft.js"></script>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       overflow: hidden;
+      background: #000;
+      font-family: Arial, sans-serif;
     }
 
-    .arjs-loader {
+    /* ÉCRAN DE CHARGEMENT */
+
+    #loader {
       position: fixed;
       inset: 0;
       z-index: 9999;
+
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.8);
+
+      padding: 25px;
+
+      background: rgba(0, 0, 0, 0.85);
       color: white;
-      font-family: Arial, sans-serif;
+
       text-align: center;
-      padding: 20px;
     }
+
+    #loader-content {
+      max-width: 320px;
+    }
+
+    #loader-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    #loader-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #ccc;
+    }
+
+    #loader-icon {
+      font-size: 35px;
+      margin-bottom: 20px;
+    }
+
+    /* INDICATEUR DE CHARGEMENT */
+
+    .spinner {
+      width: 35px;
+      height: 35px;
+
+      margin: 20px auto;
+
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: white;
+      border-radius: 50%;
+
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
   </style>
 </head>
 
 <body>
 
-  <div class="arjs-loader" id="loader">
-    <div id="loader-text">
-      Chargement de la reconnaissance...
-      <br><br>
-      Autorise la caméra et présente ta carte.
+  <!-- ÉCRAN DE CHARGEMENT -->
+
+  <div id="loader">
+
+    <div id="loader-content">
+
+      <div id="loader-icon">📷</div>
+
+      <div id="loader-title">
+        ALDILÀ — Réalité augmentée
+      </div>
+
+      <div class="spinner"></div>
+
+      <div id="loader-text">
+        Initialisation de la caméra...
+      </div>
+
     </div>
+
   </div>
 
+
+  <!-- SCÈNE AR -->
+
   <a-scene
-    vr-mode-ui="enabled: false"
     embedded
-    renderer="logarithmicDepthBuffer: true"
-    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: true;"
+    vr-mode-ui="enabled: false"
+
+    renderer="
+      logarithmicDepthBuffer: true;
+      antialias: true;
+      alpha: true;
+    "
+
+    arjs="
+      trackingMethod: best;
+      sourceType: webcam;
+      debugUIEnabled: false;
+    "
   >
 
+    <!-- RECONNAISSANCE NFT -->
+
     <a-nft
+      id="nft-marker"
+
       type="nft"
+
       url="assets/SAE502"
+
       smooth="true"
       smoothCount="10"
       smoothTolerance="0.01"
       smoothThreshold="5"
-      id="nft-marker"
     >
 
+      <!-- MODÈLE 3D -->
+
       <a-entity
+
         gltf-model="url(assets/eddies_nissan_skyline_r34_nfs_underground.glb)"
+
         scale="0.1 0.1 0.1"
+
         position="0 0 0"
-        rotation="-90 0 0">
-      </a-entity>
+
+        rotation="-90 0 0"
+
+      ></a-entity>
 
     </a-nft>
+
+
+    <!-- CAMÉRA -->
 
     <a-entity camera></a-entity>
 
   </a-scene>
 
+
+  <!-- GESTION DU CHARGEMENT ET DE LA RECONNAISSANCE -->
+
   <script>
-  const marker = document.querySelector("#nft-marker");
-const status = document.querySelector("#status");
 
-marker.addEventListener("markerFound", () => {
-  status.innerHTML = "✅ CARTE ALDILÀ DÉTECTÉE";
-  status.style.background = "green";
-});
+    const loader = document.querySelector("#loader");
 
-marker.addEventListener("markerLost", () => {
-  status.innerHTML = "⚠️ CARTE PERDUE";
-  status.style.background = "orange";
-});
+    const loaderTitle = document.querySelector("#loader-title");
 
-window.addEventListener("arjs-nft-loaded", () => {
-  status.innerHTML = "📷 FICHIERS CHARGÉS — SCAN EN COURS";
-});
+    const loaderText = document.querySelector("#loader-text");
 
-window.addEventListener("error", (e) => {
-  status.innerHTML = "❌ ERREUR : " + e.message;
-});
+    const spinner = document.querySelector(".spinner");
+
+    const marker = document.querySelector("#nft-marker");
+
+    const scene = document.querySelector("a-scene");
+
+
+    // AFFICHER UN MESSAGE
+
+    function showMessage(title, message) {
+
+      loader.style.display = "flex";
+
+      loaderTitle.textContent = title;
+
+      loaderText.textContent = message;
+
+      spinner.style.display = "block";
+
+    }
+
+
+    // MASQUER LE CHARGEMENT
+
+    function hideLoader() {
+
+      loader.style.display = "none";
+
+    }
+
+
+    // INITIALISATION DE LA SCÈNE
+
+    scene.addEventListener("loaded", () => {
+
+      showMessage(
+        "Initialisation terminée",
+        "Chargement des fichiers de reconnaissance NFT..."
+      );
+
+    });
+
+
+    // FICHIERS NFT CHARGÉS
+
+    window.addEventListener("arjs-nft-loaded", () => {
+
+      console.log("Fichiers NFT chargés.");
+
+      showMessage(
+        "Reconnaissance prête",
+        "Présente maintenant ta carte ALDILÀ devant la caméra."
+      );
+
+    });
+
+
+    // CARTE RECONNUE
+
+    marker.addEventListener("markerFound", () => {
+
+      console.log("Carte ALDILÀ détectée !");
+
+      hideLoader();
+
+    });
+
+
+    // CARTE PERDUE
+
+    marker.addEventListener("markerLost", () => {
+
+      console.log("Carte perdue.");
+
+      showMessage(
+        "Carte non détectée",
+        "Présente à nouveau ta carte devant la caméra."
+      );
+
+    });
+
+
+    // ERREURS JAVASCRIPT
+
+    window.addEventListener("error", (event) => {
+
+      console.error(event.message);
+
+      showMessage(
+        "Erreur technique",
+        "Une erreur est survenue : " + event.message
+      );
+
+      spinner.style.display = "none";
+
+    });
+
+
+    // ERREUR DE CHARGEMENT DES RESSOURCES
+
+    window.addEventListener("unhandledrejection", (event) => {
+
+      console.error(event.reason);
+
+      showMessage(
+        "Erreur de chargement",
+        "Impossible de charger une ressource. Vérifie ta connexion et les fichiers du projet."
+      );
+
+      spinner.style.display = "none";
+
+    });
+
   </script>
 
 </body>
