@@ -70,20 +70,26 @@
   </a-scene>
 
   <script>
-    const marker = document.querySelector("#nft-marker");
-    const loader = document.querySelector("#loader");
-    const loaderText = document.querySelector("#loader-text");
+  const marker = document.querySelector("#nft-marker");
+const status = document.querySelector("#status");
 
-    marker.addEventListener("markerFound", () => {
-      console.log("Carte reconnue !");
-      loader.style.display = "none";
-    });
+marker.addEventListener("markerFound", () => {
+  status.innerHTML = "✅ CARTE ALDILÀ DÉTECTÉE";
+  status.style.background = "green";
+});
 
-    marker.addEventListener("markerLost", () => {
-      console.log("Carte perdue !");
-      loader.style.display = "flex";
-      loaderText.innerHTML = "Carte non détectée.<br><br>Présente à nouveau ta carte.";
-    });
+marker.addEventListener("markerLost", () => {
+  status.innerHTML = "⚠️ CARTE PERDUE";
+  status.style.background = "orange";
+});
+
+window.addEventListener("arjs-nft-loaded", () => {
+  status.innerHTML = "📷 FICHIERS CHARGÉS — SCAN EN COURS";
+});
+
+window.addEventListener("error", (e) => {
+  status.innerHTML = "❌ ERREUR : " + e.message;
+});
   </script>
 
 </body>
