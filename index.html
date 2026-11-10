@@ -16,7 +16,7 @@
     <a-scene
         embedded
         vr-mode-ui="enabled: false"
-        renderer="logarithmicDepthBuffer: true; alpha: true"
+        renderer="logarithmicDepthBuffer: true; precision: medium"
         arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
 
         <!-- Image utilisée comme marqueur -->
@@ -24,18 +24,18 @@
             type="nft"
             url="https://leobadureau.github.io/testAR/assets/nft/a"
             smooth="true"
-            smooth-count="20"
-            smooth-tolerance="0.01"
-            smooth-threshold="10">
+            smoothCount="10"
+            smoothTolerance="0.01"
+            smoothThreshold="5">
 
-            <!-- Modèle 3D affiché quand le marqueur est reconnu -->
+            <!-- Modèle 3D : remonté sur l'axe vertical -->
             <a-entity
-    id="pikachu"
-    gltf-model="url(assets/pokemon-pikachu.glb)"
-    position="50 150 0"
-    rotation="-90 0 0"
-    scale="100 100 100">
-</a-entity>
+                id="pikachu"
+                gltf-model="url(assets/pokemon-pikachu.glb)"
+                position="50 220 0"
+                rotation="-90 0 0"
+                scale="100 100 100">
+            </a-entity>
         </a-nft>
 
         <a-entity camera></a-entity>
