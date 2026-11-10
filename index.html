@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="assets/style.css">
 
     <!-- Bibliothèques nécessaires à la réalité augmentée -->
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar-nft.js"></script>
 </head>
 <body>
 
@@ -16,7 +16,7 @@
     <a-scene
         embedded
         vr-mode-ui="enabled: false"
-        renderer="logarithmicDepthBuffer: true"
+        renderer="logarithmicDepthBuffer: true; alpha: true"
         arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
 
         <!-- Image utilisée comme marqueur -->
@@ -40,8 +40,8 @@
         <a-entity camera></a-entity>
     </a-scene>
 
-    <!-- Petit message affiché à l'écran -->
-    <div id="message">Chargement de la caméra...</div>
+    <!-- Message d'information -->
+    <div id="message">Initialisation de la réalité augmentée...</div>
 
     <script src="assets/app.js"></script>
 </body>
