@@ -1,24 +1,33 @@
-// On récupère le message affiché à l'écran
+// Élément qui affiche les informations à l'écran
 const message = document.querySelector("#message");
+const marqueur = document.querySelector("a-nft");
 
-// La caméra est prête
+// La caméra a démarré
 window.addEventListener("camera-init", () => {
-    message.textContent = "Caméra prête : vise le marqueur";
+    message.textContent = "Caméra prête : chargement du marqueur...";
 });
 
-// Une erreur est survenue avec la caméra
+// La caméra n'a pas pu démarrer
 window.addEventListener("camera-error", () => {
-    message.textContent = "Impossible d'accéder à la caméra";
+    message.textContent = "Erreur : impossible d'accéder à la caméra.";
+});
+
+// Le chargement des fichiers NFT a commencé
+marqueur.addEventListener("arjs-nft-loading", () => {
+    message.textContent = "Chargement des fichiers du marqueur...";
+});
+
+// Les fichiers NFT sont chargés
+marqueur.addEventListener("arjs-nft-loaded", () => {
+    message.textContent = "Marqueur chargé : vise la carte avec la caméra.";
 });
 
 // Le marqueur a été reconnu
-const marqueur = document.querySelector("a-nft");
-
 marqueur.addEventListener("markerFound", () => {
     message.textContent = "Marqueur détecté !";
 });
 
 // Le marqueur n'est plus visible
 marqueur.addEventListener("markerLost", () => {
-    message.textContent = "Vise le marqueur avec la caméra";
+    message.textContent = "Marqueur perdu : vise à nouveau la carte.";
 });
