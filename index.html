@@ -26,27 +26,26 @@
       font-family: Arial, sans-serif;
     }
 
-    /* ÉCRAN DE CHARGEMENT */
-
     #loader {
       position: fixed;
       inset: 0;
       z-index: 9999;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       padding: 25px;
-
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.88);
       color: white;
-
       text-align: center;
     }
 
     #loader-content {
       max-width: 320px;
+    }
+
+    #loader-icon {
+      font-size: 35px;
+      margin-bottom: 20px;
     }
 
     #loader-title {
@@ -61,23 +60,13 @@
       color: #ccc;
     }
 
-    #loader-icon {
-      font-size: 35px;
-      margin-bottom: 20px;
-    }
-
-    /* INDICATEUR DE CHARGEMENT */
-
     .spinner {
       width: 35px;
       height: 35px;
-
       margin: 20px auto;
-
       border: 3px solid rgba(255,255,255,0.2);
       border-top-color: white;
       border-radius: 50%;
-
       animation: spin 1s linear infinite;
     }
 
@@ -86,7 +75,6 @@
         transform: rotate(360deg);
       }
     }
-
   </style>
 </head>
 
@@ -95,7 +83,6 @@
   <!-- ÉCRAN DE CHARGEMENT -->
 
   <div id="loader">
-
     <div id="loader-content">
 
       <div id="loader-icon">📷</div>
@@ -111,22 +98,20 @@
       </div>
 
     </div>
-
   </div>
 
 
   <!-- SCÈNE AR -->
 
   <a-scene
+    id="ar-scene"
     embedded
     vr-mode-ui="enabled: false"
-
     renderer="
       logarithmicDepthBuffer: true;
       antialias: true;
       alpha: true;
     "
-
     arjs="
       trackingMethod: best;
       sourceType: webcam;
@@ -134,15 +119,12 @@
     "
   >
 
-    <!-- RECONNAISSANCE NFT -->
+    <!-- MARQUEUR NFT -->
 
     <a-nft
       id="nft-marker"
-
       type="nft"
-
-      url="assets/SAE502"
-
+      url="https://leobadureau.github.io/testAR/assets/SAE502"
       smooth="true"
       smoothCount="10"
       smoothTolerance="0.01"
@@ -152,19 +134,13 @@
       <!-- MODÈLE 3D -->
 
       <a-entity
-
-        gltf-model="url(assets/eddies_nissan_skyline_r34_nfs_underground.glb)"
-
+        gltf-model="url(https://leobadureau.github.io/testAR/assets/eddies_nissan_skyline_r34_nfs_underground.glb)"
         scale="0.1 0.1 0.1"
-
         position="0 0 0"
-
         rotation="-90 0 0"
-
       ></a-entity>
 
     </a-nft>
-
 
     <!-- CAMÉRA -->
 
@@ -173,39 +149,38 @@
   </a-scene>
 
 
-  <!-- GESTION DU CHARGEMENT ET DE LA RECONNAISSANCE -->
+  <!-- GESTION DU CHARGEMENT -->
 
   <script>
 
     const loader = document.querySelector("#loader");
-
     const loaderTitle = document.querySelector("#loader-title");
-
     const loaderText = document.querySelector("#loader-text");
-
     const spinner = document.querySelector(".spinner");
 
     const marker = document.querySelector("#nft-marker");
+    const scene = document.querySelector("#ar-scene");
 
-    const scene = document.querySelector("a-scene");
+    let nftLoaded = false;
+    let markerDetected = false;
+    let loadingError = false;
 
 
     // AFFICHER UN MESSAGE
 
-    function showMessage(title, message) {
+    function showMessage(title, message, showSpinner = true) {
 
       loader.style.display = "flex";
 
       loaderTitle.textContent = title;
-
       loaderText.textContent = message;
 
-      spinner.style.display = "block";
+      spinner.style.display = showSpinner ? "block" : "none";
 
     }
 
 
-    // MASQUER LE CHARGEMENT
+    // MASQUER L'ÉCRAN
 
     function hideLoader() {
 
@@ -218,6 +193,8 @@
 
     scene.addEventListener("loaded", () => {
 
+      console.log("Scène A-Frame initialisée.");
+
       showMessage(
         "Initialisation terminée",
         "Chargement des fichiers de reconnaissance NFT..."
@@ -226,23 +203,32 @@
     });
 
 
-    // FICHIERS NFT CHARGÉS
+    // CHARGEMENT NFT TERMINÉ
 
     window.addEventListener("arjs-nft-loaded", () => {
 
+      nftLoaded = true;
+
       console.log("Fichiers NFT chargés.");
 
-      showMessage(
-        "Reconnaissance prête",
-        "Présente maintenant ta carte ALDILÀ devant la caméra."
-      );
+      if (!loadingError) {
+
+        showMessage(
+          "Reconnaissance prête",
+          "Présente maintenant ta carte ALDILÀ devant la caméra.",
+          false
+        );
+
+      }
 
     });
 
 
-    // CARTE RECONNUE
+    // CARTE DÉTECTÉE
 
     marker.addEventListener("markerFound", () => {
+
+      markerDetected = true;
 
       console.log("Carte ALDILÀ détectée !");
 
@@ -255,12 +241,19 @@
 
     marker.addEventListener("markerLost", () => {
 
+      markerDetected = false;
+
       console.log("Carte perdue.");
 
-      showMessage(
-        "Carte non détectée",
-        "Présente à nouveau ta carte devant la caméra."
-      );
+      if (nftLoaded && !loadingError) {
+
+        showMessage(
+          "Carte non détectée",
+          "Présente à nouveau ta carte devant la caméra.",
+          false
+        );
+
+      }
 
     });
 
@@ -269,32 +262,72 @@
 
     window.addEventListener("error", (event) => {
 
-      console.error(event.message);
+      console.error("Erreur JavaScript :", event.message);
+
+      // Ne pas traiter les erreurs de chargement de ressources
+      // comme des erreurs JavaScript de l'application.
+      if (!event.message) return;
+
+      loadingError = true;
 
       showMessage(
         "Erreur technique",
-        "Une erreur est survenue : " + event.message
+        "Une erreur est survenue : " + event.message,
+        false
       );
-
-      spinner.style.display = "none";
 
     });
 
 
-    // ERREUR DE CHARGEMENT DES RESSOURCES
+    // ERREURS DE PROMESSES
 
     window.addEventListener("unhandledrejection", (event) => {
 
-      console.error(event.reason);
+      console.error("Erreur de chargement :", event.reason);
+
+      loadingError = true;
 
       showMessage(
         "Erreur de chargement",
-        "Impossible de charger une ressource. Vérifie ta connexion et les fichiers du projet."
+        "Impossible de charger une ressource. Vérifie ta connexion.",
+        false
       );
 
-      spinner.style.display = "none";
-
     });
+
+
+    // SURVEILLANCE DU CHARGEMENT
+
+    setTimeout(() => {
+
+      if (!nftLoaded && !loadingError) {
+
+        console.error(
+          "Le chargement NFT dépasse 30 secondes."
+        );
+
+        showMessage(
+          "Chargement trop long",
+          "Les fichiers de reconnaissance ne répondent pas. Vérifie les fichiers NFT et leur compatibilité.",
+          false
+        );
+
+      }
+
+    }, 30000);
+
+
+    // DIAGNOSTIC
+
+    console.log("URL des fichiers NFT :");
+    console.log(
+      "https://leobadureau.github.io/testAR/assets/SAE502"
+    );
+
+    console.log("URL du modèle 3D :");
+    console.log(
+      "https://leobadureau.github.io/testAR/assets/eddies_nissan_skyline_r34_nfs_underground.glb"
+    );
 
   </script>
 
