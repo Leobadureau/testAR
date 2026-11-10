@@ -6,33 +6,29 @@
     <title>Mon projet AR</title>
     <link rel="stylesheet" href="assets/style.css">
 
-    <!-- Bibliothèques nécessaires à la réalité augmentée -->
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.7/aframe/build/aframe-ar-nft.js"></script>
 </head>
 <body>
-
-    <!-- Scène de réalité augmentée -->
     <a-scene
         embedded
         vr-mode-ui="enabled: false"
         renderer="logarithmicDepthBuffer: true; precision: medium"
         arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
 
-        <!-- Image utilisée comme marqueur sur le mur -->
         <a-nft
             type="nft"
             url="https://leobadureau.github.io/testAR/assets/nft/a"
             smooth="true"
-            smoothCount="20"
+            smoothCount="10"
             smoothTolerance="0.01"
-            smoothThreshold="10">
+            smoothThreshold="5">
 
-            <!-- Modèle complet : triangle + Pikachu -->
+            <!-- GLB complet : triangle + Pikachu -->
             <a-entity
                 id="pikachu"
                 gltf-model="url(assets/pokemon-pikachu.glb)"
-                position="100 -800 0"
+                position="100 -900 -20"
                 rotation="-90 0 0"
                 scale="300 300 300">
             </a-entity>
@@ -41,9 +37,7 @@
         <a-entity camera></a-entity>
     </a-scene>
 
-    <!-- Message d'information -->
     <div id="message">Initialisation de la réalité augmentée...</div>
-
     <script src="assets/app.js"></script>
 </body>
 </html>
