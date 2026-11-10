@@ -19,7 +19,7 @@
         renderer="logarithmicDepthBuffer: true; precision: medium"
         arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
 
-        <!-- Image utilisée comme marqueur -->
+        <!-- Image utilisée comme marqueur sur le mur -->
         <a-nft
             type="nft"
             url="https://leobadureau.github.io/testAR/assets/nft/a"
@@ -28,11 +28,11 @@
             smoothTolerance="0.01"
             smoothThreshold="10">
 
-            <!-- Modèle 3D : position relevée et échelle uniforme -->
+            <!-- Pikachu est ancré au plan du marqueur et ressort légèrement du mur -->
             <a-entity
                 id="pikachu"
                 gltf-model="url(assets/pokemon-pikachu.glb)"
-                position="50 500 0"
+                position="0 0 10"
                 rotation="-90 0 0"
                 scale="120 120 120">
             </a-entity>
